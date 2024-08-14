@@ -1,0 +1,57 @@
+services:
+  nginx:
+    container_name: nginx
+#    networks:
+#      - inception
+#    depends_on:
+#      - wordpress
+    build: requirements/nginx/.
+#    env_file: .env
+#   volumes:
+#     - wordpress:/var/www/wordpress
+#   volumes:
+#     - wordpress:/var/www/wordpress
+    volumes:
+      - ./web:/var/www/html
+    restart: always
+    ports:
+      - "80:80"
+  mariadb:
+    container_name: mariadb
+#    networks:
+#      - inception
+    build: requirements/mariadb/.
+    env_file: .env
+    volumes:
+      - mariadb:/var/lib/mysql
+#    volumes:
+#      - ./mariadb:/var/lib/mysql
+#    restart: always
+  wordpress:
+    container_name: wordpress
+#    networks:
+#      - inception
+#   depends_on:
+#     - mariadb
+    build: requirements/wordpress/.
+#    env_file: .env
+#    volumes:
+#     - wordpress:/var/www/wordpress
+    volumes:
+      - ./web:/var/www/html
+#    restart: always
+
+
+volumes:
+# wordpress:
+#   driver: local
+#   driver_opts:
+#     type: 'none'
+#     o: 'bind'
+#     device: '/home/gpouzet/data/wordpress'
+  mariadb:
+    driver: local
+    driver_opts:
+     type: 'none'
+     o: 'bind'
+     device: '/home/gpouzet/data/mariadb'
