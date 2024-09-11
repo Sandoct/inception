@@ -1,15 +1,19 @@
-FROM	debian:buster
+# Description: Wordpress Dockerfile
 
-RUN	apt-get update -y && apt-get upgrade -y && apt-get install -y \
-	php-fpm php-mysqli curl
+# pull the base image
+FROM debian:11
 
-#RUN 	apt-get install -y wget php php-fpm php-mysql mariadb-client
-RUN	mkdir -p /var/run/php-fpm
+# update and upgrade the system
+RUN apt-get update && apt-get upgrade -y
 
-RUN	service php7.3-fpm start
-COPY	www.conf /etc/php/7.3/fpm/pool.d/.
-COPY	tools/script.sh .
-RUN	chmod +x script.sh
+# install the required packages
+RUN apt-get install -y curl php php7.4-fpm php-mysql mariadb-client
 
-CMD	["./script.sh"]
-#CMD ["/usr/sbin/php-fpm7.3", "-F"]
+# copy the wordpress configuration script to the root directory in the container
+COPY tools/wp_conf.sh ./
+
+# change the permission of the script to make it executable
+RUN  chmod +x wp_conf.sh
+
+# define the entrypoint command to run when the container starts
+ENTRYPOINT ["./wp_conf.sh"]

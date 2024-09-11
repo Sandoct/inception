@@ -1,17 +1,22 @@
-FROM	debian:11
+# Description: MariaDB Dockerfile
 
-RUN	apt-get update -y && apt-get upgrade -y && apt-get install -y mariadb-server
-#RUN		apt-get install -y vim
+# pull base image
+FROM debian:11
 
-COPY	50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
-#COPY	tools/init.sql /etc/mysql/init.sql
+# update and upgrade the system
+RUN apt-get update && apt-get upgrade -y
 
-RUN	mkdir -p /run/mysql
-COPY	tools/maria.sh /run/mariadb/maria.sh
-RUN	chmod +x /run/mariadb/maria.sh
+# # install the required packages
+RUN apt-get install -y mariadb-server
+RUN chown -R mysql: /var/lib/mysql
+RUN mkdir -p /var/run/mysqld \
+	&& chown -R mysql:mysql /var/run/mysqld \
+	&& chmod 777 /var/run/mysqld
+# copy file from host to container
+COPY tools/mdb-conf.sh /mdb-conf.sh
 
-#EXPOSE 3306
+# set permissions to the file
+RUN chmod +x /mdb-conf.sh
 
-#CMD	["run/mariadb/maria.sh"]
-ENTRYPOINT	["bash", "/run/mariadb/maria.sh"]
-#CMD ["mysql"]
+# define entrypoint command to run when the container starts
+ENTRYPOINT ["./mdb-conf.sh"]

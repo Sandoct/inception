@@ -1,22 +1,31 @@
-FROM	debian:11
+# Description: Nginx Dockerfile
 
-RUN	apt-get update -y && apt-get upgrade -y && apt-get install -y nginx openssl
-#RUN	apt-get install -y vim
+# pull the base image
+FROM debian:11
 
-#RUN 	mkdir -p /etc/nginx/ssl
+# update and upgrade the system
+RUN apt-get update && apt-get upgrade -y
 
-#RUN	openssl req -x509 -nodes \
-#		-out /etc/nginx/ssl/inception.crt \
-#		-keyout /etc/nginx/ssl/inception.key \
-#		-subj "/C=FR/ST=Angouleme/L=Paris/O=42/OU=42/CN=gpouzet.42.fr/UID=gpouzet"
+# # install the required packages
+RUN apt-get install -y nginx openssl
 
-#RUN	mkdir -p /var/run/nginx
+# create the ssl directory
+RUN mkdir -p /etc/nginx/ssl
 
-#COPY	conf/nginx.conf /etc/nginx/nginx.conf
+# generate the ssl certificate
+RUN    openssl req -x509 -nodes \
+               -out /etc/nginx/ssl/inception.crt \
+               -keyout /etc/nginx/ssl/inception.key \
+               -subj "/C=FR/ST=Angouleme/L=Paris/O=42/OU=42/CN=gpouzet.42.fr/UID=gpouzet"
 
-#RUN	chmod 755 /var/www/html
-#RUN	chown -R www-data:www-data /var/www/html
+# copy the nginx configuration file
+COPY conf/nginx.conf /etc/nginx/nginx.conf
 
-COPY	default /etc/nginx/sites-available/.
+# create the wordpress directory
+RUN mkdir -p /var/www/wordpress
 
-CMD	["nginx", "-g", "daemon off;"]
+# change the owner of the wordpress directory to www-data
+RUN chown -R www-data:www-data /var/www/wordpress
+
+# define the command to run when the container starts
+CMD ["nginx", "-g", "daemon off;"]
